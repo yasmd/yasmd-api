@@ -1,0 +1,10 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: yasmd-api
+    src: ./src
+    engine: nodejs16
+    dev: npm run dev
+    run: node index.js
+    public: true
+    primary: true
