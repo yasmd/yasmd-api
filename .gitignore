@@ -131,3 +131,6 @@ dist
 
 # Deta Space
 .space
+
+# FFmpeg
+util/ffmpeg
