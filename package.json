@@ -1,0 +1,19 @@
+{
+  "name": "yasmd-api",
+  "version": "0.0.0",
+  "description": "API for Yet Another Social Media Downloader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dioxair/yasmd-api.git"
+  },
+  "author": "Samuel Olagunju",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dioxair/yasmd-api/issues"
+  },
+  "homepage": "https://github.com/dioxair/yasmd-api#readme"
+}
