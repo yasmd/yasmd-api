@@ -35,17 +35,17 @@ app.post("/yt/info", async (req, res) => {
 });
 
 app.post("/yt/dl", (req, res) => {
-  if (req.body.url !== undefined) {
+  if (req.body.url !== undefined || req.body.itag !== undefined) {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
     res.writeHead(200, { "Content-Type": "video/mp4" });
-    createVideo(req.body.url, res);
+    createVideo(req.body.url, req.body.itag, res);
   } else {
     res.json({ error: "No video URL defined" });
   }
 });
 
-function createVideo(url, res) {
-  let video = ytdl(url, { filter: "videoonly" });
+function createVideo(url, itag, res) {
+  let video = ytdl(url, { quality: itag, filter: "videoonly" });
   let audio = ytdl(url, {
     filter: "audioonly",
     highWaterMark: 1 << 25,
