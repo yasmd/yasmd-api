@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 const app = express();
 app.use(express.json());
 
-app.post("/", (req, res) => {
+app.post("/yt/dl", (req, res) => {
   if (req.body.url !== undefined) {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
     res.writeHead(200, { "Content-Type": "video/mp4" });
