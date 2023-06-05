@@ -5,6 +5,35 @@ import { spawn } from "child_process";
 const app = express();
 app.use(express.json());
 
+app.post("/yt/info", async (req, res) => {
+  let info = await ytdl.getInfo(req.body.url);
+  let videoDetails = info.videoDetails;
+  let videoMetadata = {
+    title: videoDetails.title,
+    description: videoDetails.description,
+    viewCount: videoDetails.viewCount,
+    uploadDate: videoDetails.uploadDate,
+    channelName: videoDetails.author.name,
+    thumbnails: videoDetails.thumbnails,
+  };
+  let rawVideoQualityInfo = [];
+  info.formats.forEach((i) => {
+    if (i.mimeType.includes("mp4") && i.qualityLabel !== null) {
+      rawVideoQualityInfo.push({
+        itag: i.itag,
+        quality: i.qualityLabel,
+      });
+    }
+  }); // sorts all itags and qualities available into a list
+  let videoQualityInfo = [
+    ...new Map(rawVideoQualityInfo.map((i) => [i.quality, i])).values(),
+  ]; // previously mentioned list without quality duplicates
+  res.send({
+    videoMetadata: videoMetadata,
+    videoQualityInfo: videoQualityInfo,
+  });
+});
+
 app.post("/yt/dl", (req, res) => {
   if (req.body.url !== undefined) {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
