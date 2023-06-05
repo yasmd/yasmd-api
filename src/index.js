@@ -26,9 +26,9 @@ function createVideo(url, res) {
     "../util/ffmpeg",
     [
       "-i",
-      `pipe:3`,
+      "pipe:3",
       "-i",
-      `pipe:4`,
+      "pipe:4",
       "-map",
       "0:v",
       "-map",
