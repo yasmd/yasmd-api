@@ -16,18 +16,20 @@ app.post("/yt/info", async (req, res) => {
     channelName: videoDetails.author.name,
     thumbnails: videoDetails.thumbnails,
   };
-  let rawVideoQualityInfo = [];
+  let videoQualityInfo = [];
   info.formats.forEach((i) => {
-    if (i.mimeType.includes("mp4") && i.qualityLabel !== null) {
-      rawVideoQualityInfo.push({
+    if (
+      i.mimeType.includes("mp4") &&
+      i.qualityLabel !== null &&
+      i.itag !== 22 &&
+      i.itag !== 18
+    ) {
+      videoQualityInfo.push({
         itag: i.itag,
         quality: i.qualityLabel,
       });
     }
   }); // sorts all itags and qualities available into a list
-  let videoQualityInfo = [
-    ...new Map(rawVideoQualityInfo.map((i) => [i.quality, i])).values(),
-  ]; // previously mentioned list without quality duplicates
   res.send({
     videoMetadata: videoMetadata,
     videoQualityInfo: videoQualityInfo,
