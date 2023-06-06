@@ -41,13 +41,17 @@ app.post("/yt/dl", (req, res) => {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
     res.writeHead(200, { "Content-Type": "video/mp4" });
     createVideo(req.body.url, req.body.itag, res);
+  } else if (req.body.itag === undefined && req.body.quality !== undefined) {
+    res.setHeader("Content-disposition", "attachment; filename=video.mp4");
+    res.writeHead(200, { "Content-Type": "video/mp4" });
+    createVideo(req.body.url, req.body.quality, res);
   } else {
-    res.json({ error: "No video URL defined" });
+    res.status(400).json({ error: "Incorrect parameters." });
   }
 });
 
-function createVideo(url, itag, res) {
-  let video = ytdl(url, { quality: itag, filter: "videoonly" });
+function createVideo(url, quality, res) {
+  let video = ytdl(url, { quality: quality, filter: "videoonly" });
   let audio = ytdl(url, {
     filter: "audioonly",
     highWaterMark: 1 << 25,
