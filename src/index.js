@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 const app = express();
 app.use(express.json());
 
-app.post("/yt/info", async (req, res) => {
+app.get("/yt/info", async (req, res) => {
   let info = await ytdl.getInfo(req.body.url);
   let videoDetails = info.videoDetails;
   let videoMetadata = {
