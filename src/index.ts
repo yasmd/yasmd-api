@@ -1,13 +1,14 @@
 import express from "express";
 import ytdl from "ytdl-core";
-import { spawn } from "child_process";
+import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { Readable, Writable } from "stream";
 
 const app = express();
 app.use(express.json());
 
 app.post("/yt/info", async (req, res) => {
-  let info = await ytdl.getInfo(req.body.url);
-  let videoDetails = info.videoDetails;
+  let info: ytdl.videoInfo = await ytdl.getInfo(req.body.url);
+  let videoDetails: ytdl.MoreVideoDetails = info.videoDetails;
   let videoMetadata = {
     title: videoDetails.title,
     description: videoDetails.description,
@@ -16,10 +17,10 @@ app.post("/yt/info", async (req, res) => {
     channelName: videoDetails.author.name,
     thumbnails: videoDetails.thumbnails,
   };
-  let videoQualityInfo = [];
+  let videoQualityInfo: Array<Object> = [];
   info.formats.forEach((i) => {
     if (
-      i.mimeType.includes("mp4") &&
+      i.mimeType?.includes("mp4") &&
       i.qualityLabel !== null &&
       i.itag !== 22 &&
       i.itag !== 18
@@ -39,25 +40,25 @@ app.post("/yt/info", async (req, res) => {
 app.post("/yt/dl", (req, res) => {
   if (req.body.url !== undefined || req.body.itag !== undefined) {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
-    res.writeHead(200, { "Content-Type": "video/mp4" });
+    res.setHeader("Content-Type", "video/mp4");
     createVideo(req.body.url, req.body.itag, res);
   } else if (req.body.itag === undefined && req.body.quality !== undefined) {
     res.setHeader("Content-disposition", "attachment; filename=video.mp4");
-    res.writeHead(200, { "Content-Type": "video/mp4" });
+    res.setHeader("Content-Type", "video/mp4");
     createVideo(req.body.url, req.body.quality, res);
   } else {
     res.status(400).json({ error: "Incorrect parameters." });
   }
 });
 
-function createVideo(url, quality, res) {
-  let video = ytdl(url, { quality: quality, filter: "videoonly" });
-  let audio = ytdl(url, {
+function createVideo(url: string, quality: string, res: Writable) {
+  let video: Readable = ytdl(url, { quality: quality, filter: "videoonly" });
+  let audio: Readable = ytdl(url, {
     filter: "audioonly",
     highWaterMark: 1 << 25,
   });
 
-  const ffmpegProcess = spawn(
+  const ffmpegProcess: ChildProcessWithoutNullStreams = spawn(
     "../util/ffmpeg",
     [
       "-i",
@@ -89,17 +90,17 @@ function createVideo(url, quality, res) {
     }
   );
 
-  video.pipe(ffmpegProcess.stdio[3]);
-  audio.pipe(ffmpegProcess.stdio[4]);
+  video.pipe(ffmpegProcess.stdio[3] as Writable);
+  audio.pipe(ffmpegProcess.stdio[4] as Writable);
   ffmpegProcess.stdio[1].pipe(res);
 
   let ffmpegLogs = "";
 
-  ffmpegProcess.stdio[2].on("data", (chunk) => {
+  ffmpegProcess.stdio[2].on("data", (chunk: any) => {
     ffmpegLogs += chunk.toString();
   });
 
-  ffmpegProcess.on("exit", (exitCode) => {
+  ffmpegProcess.on("exit", (exitCode: number) => {
     if (exitCode === 1) {
       console.error(ffmpegLogs);
     }
